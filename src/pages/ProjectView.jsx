@@ -14,7 +14,7 @@ const ProjectView = () => {
     const getProject = async () => {
       try {
         const { data } = await axios.get(
-          `https://backend-pi-ochre.vercel.app/api/v1/project/get/${id}`,
+          `https://backend1-ebon.vercel.app//api/v1/project/get/${id}`,
           { withCredentials: true }
         );
         setProject(data.project);

@@ -21,7 +21,7 @@ const Hero = () => {
     const getMyProfile = async () => {
       try {
         const { data } = await axios.get(
-          "https://backend-pi-ochre.vercel.app/api/v1/user/portfolio/me",
+          "https://backend1-ebon.vercel.app//api/v1/user/portfolio/me",
           { withCredentials: true }
         );
         setUser(data.user);

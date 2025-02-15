@@ -12,7 +12,7 @@ const Portfolio = () => {
   const getMyProjects = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://backend-pi-ochre.vercel.app/api/v1/project/getall",
+        "https://backend1-ebon.vercel.app//api/v1/project/getall",
         { withCredentials: true }
       );
       setProjects(data.projects);

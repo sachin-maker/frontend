@@ -9,7 +9,7 @@ const Skills = () => {
   const getMySkills = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        "https://backend-pi-ochre.vercel.app/api/v1/skill/getall",
+        "https://backend1-ebon.vercel.app//api/v1/skill/getall",
         { withCredentials: true }
       );
       setSkills(data.skills);
