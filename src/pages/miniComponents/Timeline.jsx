@@ -9,7 +9,7 @@ const Timeline = () => {
     const getMyTimeline = async () => {
       try {
         const { data } = await axios.get(
-          "https://backend1-ebon.vercel.app//api/v1/timeline/getall",
+          "https://backend1-ebon.vercel.app/api/v1/timeline/getall",
           { withCredentials: true }
         );
         setTimeline(data.timelines.reverse());

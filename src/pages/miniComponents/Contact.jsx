@@ -16,7 +16,7 @@ const Contact = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://backend1-ebon.vercel.app//api/v1/message/send",
+        "https://backend1-ebon.vercel.app/api/v1/message/send",
         { senderName, subject, message },
         {
           withCredentials: true,

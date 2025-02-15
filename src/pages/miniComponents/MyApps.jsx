@@ -10,7 +10,7 @@ const MyApps = () => {
     const getMyApps = async () => {
       try {
         const { data } = await axios.get(
-          "https://backend1-ebon.vercel.app//api/v1/softwareapplication/getall",
+          "https://backend1-ebon.vercel.app/api/v1/softwareapplication/getall",
           { withCredentials: true }
         );
         setApps(data.softwareApplications);
