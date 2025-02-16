@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 
 const MyApps = () => {
   const [apps, setApps] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getMyApps = async () => {
@@ -16,6 +17,8 @@ const MyApps = () => {
         setApps(data.softwareApplications);
       } catch (error) {
         console.error("Error fetching apps:", error);
+      } finally {
+        setLoading(false);
       }
     };
     getMyApps();
@@ -34,49 +37,66 @@ const MyApps = () => {
         MY APPS
       </motion.h1>
 
-      {/* Grid Container */}
-      <motion.div
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0, y: 20 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { staggerChildren: 0.15, ease: "easeOut" },
-          },
-        }}
-      >
-        {apps.map((app) => (
-          <motion.div
-            key={app._id}
-            whileHover={{ scale: 1.05, rotate: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          >
-            <Card
-              className="h-fit p-7 flex flex-col justify-center items-center gap-3 
-              bg-white/10 backdrop-blur-md border border-white/20 shadow-lg rounded-xl 
-              hover:shadow-xl transition-all duration-300 dark:bg-gray-800/50"
+      {/* Loading Skeleton */}
+      {loading ? (
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {[...Array(10)].map((_, index) => (
+            <div
+              key={index}
+              className="h-32 sm:h-40 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl"
+            ></div>
+          ))}
+        </motion.div>
+      ) : (
+        /* Grid Container */
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { staggerChildren: 0.15, ease: "easeOut" },
+            },
+          }}
+        >
+          {apps.map((app) => (
+            <motion.div
+              key={app._id}
+              whileHover={{ scale: 1.05, rotate: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 10 }}
             >
-              {/* Image */}
-              <motion.img
-                src={app.svg?.url || "/placeholder.svg"}
-                alt={app.name}
-                className="h-16 sm:h-24 w-auto object-contain drop-shadow-lg"
-                loading="lazy"
-                whileHover={{ rotate: [0, -2, 2, 0] }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-              />
+              <Card
+                className="h-fit p-7 flex flex-col justify-center items-center gap-3 
+                bg-white/10 backdrop-blur-md border border-white/20 shadow-lg rounded-xl 
+                hover:shadow-xl transition-all duration-300 dark:bg-gray-800/50"
+              >
+                {/* Image */}
+                <motion.img
+                  src={app.svg?.url || "/placeholder.svg"}
+                  alt={app.name}
+                  className="h-16 sm:h-24 w-auto object-contain drop-shadow-lg"
+                  loading="lazy"
+                  whileHover={{ rotate: [0, -2, 2, 0] }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                />
 
-              {/* Name */}
-              <p className="text-muted-foreground text-center text-lg font-semibold tracking-wide">
-                {app.name}
-              </p>
-            </Card>
-          </motion.div>
-        ))}
-      </motion.div>
+                {/* Name */}
+                <p className="text-muted-foreground text-center text-lg font-semibold tracking-wide">
+                  {app.name}
+                </p>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 };

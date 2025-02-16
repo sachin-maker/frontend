@@ -1,24 +1,39 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+
+// Shimmer Loader Component
+const ShimmerLoader = () => (
+  <div className="mb-12 ms-6">
+    <div className="w-8 h-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse"></div>
+    <div className="h-5 w-32 bg-gray-400 dark:bg-gray-600 rounded mt-2 animate-pulse"></div>
+    <div className="h-4 w-24 bg-gray-400 dark:bg-gray-600 rounded mt-1 animate-pulse"></div>
+    <div className="h-12 w-full bg-gray-300 dark:bg-gray-700 rounded mt-2 animate-pulse"></div>
+  </div>
+);
 
 const Timeline = () => {
   const [timeline, setTimeline] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getMyTimeline = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        "https://backend1-ebon.vercel.app/api/v1/timeline/getall",
+        { withCredentials: true }
+      );
+      setTimeline(data.timelines.reverse());
+    } catch (error) {
+      console.error("Error fetching timeline data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const getMyTimeline = async () => {
-      try {
-        const { data } = await axios.get(
-          "https://backend1-ebon.vercel.app/api/v1/timeline/getall",
-          { withCredentials: true }
-        );
-        setTimeline(data.timelines.reverse());
-      } catch (error) {
-        console.error("Error fetching timeline data:", error);
-      }
-    };
     getMyTimeline();
-  }, []);
+  }, [getMyTimeline]);
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
@@ -45,51 +60,53 @@ const Timeline = () => {
           },
         }}
       >
-        {timeline.length > 0 ? (
-          timeline.map((element, index) => (
-            <motion.li
-              key={element._id}
-              className="mb-12 ms-6 group"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              {/* Timeline Marker - FIXED HOVER ISSUE */}
-              <motion.span
-                className="absolute flex items-center justify-center w-8 h-8 
-                bg-blue-500 text-white font-bold rounded-full -start-4 ring-4 
-                ring-white dark:ring-gray-900 transition-all duration-300 shadow-lg"
-                whileHover={{
-                  scale: 1.05, // Subtle scale increase to prevent jitter
-                  transition: { duration: 0.3, ease: "easeInOut" },
+        {loading
+          ? Array.from({ length: 5 }).map((_, index) => <ShimmerLoader key={index} />) // Show shimmer effect while loading
+          : timeline.length > 0
+          ? timeline.map((element, index) => (
+              <motion.li
+                key={element._id}
+                className="mb-12 ms-6 group"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 },
                 }}
-                style={{ willChange: "transform" }} // Optimize rendering
               >
-                {index + 1}
-              </motion.span>
+                {/* Timeline Marker */}
+                <motion.span
+                  className="absolute flex items-center justify-center w-8 h-8 
+                  bg-blue-500 text-white font-bold rounded-full -start-4 ring-4 
+                  ring-white dark:ring-gray-900 transition-all duration-300 shadow-lg"
+                  whileHover={{
+                    scale: 1.05,
+                    transition: { duration: 0.3, ease: "easeInOut" },
+                  }}
+                  style={{ willChange: "transform" }}
+                >
+                  {index + 1}
+                </motion.span>
 
-              {/* Title */}
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
-                {element.title}
-              </h3>
+                {/* Title */}
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
+                  {element.title}
+                </h3>
 
-              {/* Date Range */}
-              <time className="block mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                {element.timeline.from} - {element.timeline.to || "Present"}
-              </time>
+                {/* Date Range */}
+                <time className="block mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {element.timeline.from} - {element.timeline.to || "Present"}
+                </time>
 
-              {/* Description */}
-              <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                {element.description}
-              </p>
-            </motion.li>
-          ))
-        ) : (
-          <p className="text-center text-lg font-medium text-gray-500 dark:text-gray-400">
-            No timelines available
-          </p>
-        )}
+                {/* Description */}
+                <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {element.description}
+                </p>
+              </motion.li>
+            ))
+          : (
+            <p className="text-center text-lg font-medium text-gray-500 dark:text-gray-400">
+              No timelines available
+            </p>
+          )}
       </motion.ol>
     </div>
   );

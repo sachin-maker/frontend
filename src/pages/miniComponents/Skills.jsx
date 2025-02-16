@@ -3,10 +3,21 @@ import axios from "axios";
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 
+// Shimmer Loader Component
+const ShimmerLoader = () => (
+  <div className="h-fit p-7 flex flex-col justify-center items-center gap-3 
+    bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse">
+    <div className="h-12 sm:h-24 w-24 bg-gray-400 dark:bg-gray-600 rounded-md"></div>
+    <div className="h-4 w-16 bg-gray-400 dark:bg-gray-600 rounded"></div>
+  </div>
+);
+
 const Skills = () => {
   const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const getMySkills = useCallback(async () => {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         "https://backend1-ebon.vercel.app/api/v1/skill/getall",
@@ -15,6 +26,8 @@ const Skills = () => {
       setSkills(data.skills);
     } catch (error) {
       console.error("Failed to fetch skills:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -49,49 +62,51 @@ const Skills = () => {
           },
         }}
       >
-        {skills.map((skill, index) => (
-          <motion.div
-            key={skill._id}
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0 },
-            }}
-          >
-            <Card
-              className="h-fit p-7 flex flex-col justify-center items-center gap-3 
-              hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 
-              relative overflow-hidden group 
-              bg-white border border-gray-300 shadow-md dark:bg-gradient-to-br 
-              dark:from-gray-800 dark:to-gray-900 dark:hover:from-gray-700 
-              dark:hover:to-gray-800 dark:border-none"
-            >
-              {/* Glow Effect (Only in Dark Mode) */}
+        {loading
+          ? Array.from({ length: 10 }).map((_, index) => <ShimmerLoader key={index} />) // Show shimmer effect while loading
+          : skills.map((skill, index) => (
               <motion.div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 
-                dark:bg-[radial-gradient(circle,rgba(255,255,255,0.15)_0%,rgba(0,0,0,0)_70%)]"
-              ></motion.div>
-
-              {/* SVG with Hover Animation */}
-              <motion.img
-                src={skill.svg?.url || "/fallback.svg"}
-                alt={skill.title}
-                className="h-12 sm:h-24 w-auto transition-transform duration-300 
-                group-hover:scale-110 group-hover:rotate-3"
-              />
-
-              {/* Skill Title */}
-              <motion.p
-                className="text-center font-medium transition-colors 
-                text-gray-800 dark:text-muted-foreground"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                key={skill._id}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 },
+                }}
               >
-                {skill.title}
-              </motion.p>
-            </Card>
-          </motion.div>
-        ))}
+                <Card
+                  className="h-fit p-7 flex flex-col justify-center items-center gap-3 
+                  hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 
+                  relative overflow-hidden group 
+                  bg-white border border-gray-300 shadow-md dark:bg-gradient-to-br 
+                  dark:from-gray-800 dark:to-gray-900 dark:hover:from-gray-700 
+                  dark:hover:to-gray-800 dark:border-none"
+                >
+                  {/* Glow Effect (Only in Dark Mode) */}
+                  <motion.div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 
+                    dark:bg-[radial-gradient(circle,rgba(255,255,255,0.15)_0%,rgba(0,0,0,0)_70%)]"
+                  ></motion.div>
+
+                  {/* SVG with Hover Animation */}
+                  <motion.img
+                    src={skill.svg?.url || "/fallback.svg"}
+                    alt={skill.title}
+                    className="h-12 sm:h-24 w-auto transition-transform duration-300 
+                    group-hover:scale-110 group-hover:rotate-3"
+                  />
+
+                  {/* Skill Title */}
+                  <motion.p
+                    className="text-center font-medium transition-colors 
+                    text-gray-800 dark:text-muted-foreground"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    {skill.title}
+                  </motion.p>
+                </Card>
+              </motion.div>
+            ))}
       </motion.div>
     </div>
   );
